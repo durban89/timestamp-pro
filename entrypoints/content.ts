@@ -1,12 +1,12 @@
 import React from 'react';
 import { createRoot, type Root } from 'react-dom/client';
-import '@/entrypoints/popup/App.css'; 
+import '@/entrypoints/popup/App.css';
 import TimeBubble from '@/components/TimeBubble';
 
 export default defineContentScript({
   matches: ['<all_urls>'],
-  
-main(ctx) {
+
+  main(ctx) {
     let iframeContainer: HTMLIFrameElement | null = null;
 
     const destroyIframe = () => {
@@ -22,7 +22,7 @@ main(ctx) {
 
       const selectedText = selection.toString().trim();
       const timestampRegex = /^\d{10}$|^\d{13}$/;
-      
+
       if (!timestampRegex.test(selectedText)) {
         if (selectedText === '') {
           // 如果点击的是我们自己的 Iframe 内部，绝不销毁
@@ -56,7 +56,7 @@ main(ctx) {
       iframeContainer = document.createElement('iframe');
       // 通过 WXT 的内置方法获取本地 bubble.html 的安全扩展路径
       iframeContainer.src = browser.runtime.getURL('/bubble.html');
-      
+
       // ⭐ 核心硬核样式：消除 Iframe 默认的白底、边框和滚动条，使其变成全透明“贴纸”
       iframeContainer.style.position = 'absolute';
       iframeContainer.style.top = `${bubbleY}px`;
@@ -68,7 +68,7 @@ main(ctx) {
       iframeContainer.style.overflow = 'hidden';
       iframeContainer.style.zIndex = '2147483647'; // 顶格层级
       iframeContainer.allow = 'clipboard-write'; // 授权 Iframe 写入剪贴板的权限
-      
+
       document.body.appendChild(iframeContainer);
 
       // 4. ⭐ 大厂级通信规范：当 Iframe 加载完成后，将划词数据安全地“推”进沙箱内部
@@ -104,14 +104,14 @@ main(ctx) {
         // 2. 如果屏幕上没有气泡，在浏览器可视区域的正中央，优雅地贴出我们的提效面板
         const bubbleWidth = 222;
         const bubbleHeight = 107;
-        
+
         // 计算 Viewport 视口正中央的绝对坐标（包含滚动条位移）
         const bubbleX = (window.innerWidth - bubbleWidth) / 2 + window.scrollX;
         const bubbleY = (window.innerHeight - bubbleHeight) / 2 + window.scrollY;
 
         iframeContainer = document.createElement('iframe');
         iframeContainer.src = browser.runtime.getURL('/bubble.html');
-        
+
         iframeContainer.style.position = 'absolute';
         iframeContainer.style.top = `${bubbleY}px`;
         iframeContainer.style.left = `${bubbleX}px`;
@@ -122,7 +122,7 @@ main(ctx) {
         iframeContainer.style.overflow = 'hidden';
         iframeContainer.style.zIndex = '2147483647';
         iframeContainer.allow = 'clipboard-write';
-        
+
         document.body.appendChild(iframeContainer);
 
         // 3. 页面载入后，默认把当前（now）的最新时间戳直接推给 React 渲染出来
