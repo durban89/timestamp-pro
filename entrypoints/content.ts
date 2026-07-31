@@ -4,7 +4,9 @@ import '@/entrypoints/popup/App.css';
 import TimeBubble from '@/components/TimeBubble';
 
 export default defineContentScript({
-  matches: ['<all_urls>'],
+  matches: import.meta.env.MODE === 'development' 
+  ? ['https://*.wxt-dev-test.invalid/*'] 
+  : ['<all_urls>'],
 
   main(ctx) {
     let iframeContainer: HTMLIFrameElement | null = null;

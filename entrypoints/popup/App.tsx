@@ -28,6 +28,15 @@ function App() {
   const [copyStatus, setCopyStatus] = useState<string>('');
 
   useEffect(() => {
+    // 动态获取当前扩展 manifest 中配置的名称并赋值给标签页标题
+    if (typeof browser !== 'undefined' && browser.runtime?.getManifest) {
+      document.title = browser.runtime.getManifest().name;
+    } else if (typeof chrome !== 'undefined' && chrome.runtime?.getManifest) {
+      document.title = chrome.runtime.getManifest().name;
+    }
+  }, []);
+
+  useEffect(() => {
     // 1. 页面初次加载时，先读取一次可能已经存在的划词数据
     chrome.storage.local.get(['activeTimestamp'], (res) => {
       if (res.activeTimestamp) {
@@ -73,7 +82,7 @@ function App() {
 
     try {
       let targetDate: Date;
-      
+
       if (timeMode === 'timestamp') {
         const cleanNum = inputValue.replace(/\D/g, ''); // 清洗非数字字符
         if (!cleanNum) throw new Error('Invalid format');
@@ -102,7 +111,7 @@ function App() {
         isValid: true,
       });
     } catch (err) {
-      setConversionResult(prev => ({...prev, isvalid: false}));
+      setConversionResult(prev => ({ ...prev, isvalid: false }));
     }
   }, [inputValue, timeMode]);
 
@@ -119,10 +128,13 @@ function App() {
     }
   };
 
+  const isStandalone = new URLSearchParams(window.location.search).get('mode') === 'standalone';
+
   return (
-    <div className="w-[380px] min-h-[420px] bg-slate-950 text-slate-100 p-4 font-mono select-none antialiased">
-      {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+    <div className={isStandalone ? "fixed inset-0 w-screen h-screen flex items-center justify-center bg-slate-50 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem]" : ""}>
+      <div className="w-[380px] min-h-[420px] bg-slate-950 text-slate-100 p-4 font-mono select-none antialiased border border-slate-800 rounded-xl shadow-2xl shadow-emerald-500/5">
+        {/* Header */}
+        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
         <h1 className="text-sm font-bold tracking-wider text-emerald-400">⚡ TIMESTAMP PRO</h1>
         <button 
           onClick={setNow}
@@ -132,82 +144,83 @@ function App() {
         </button>
       </div>
 
-      {/* Mode Switcher */}
-      <div className="grid grid-cols-2 gap-2 my-4 p-1 bg-slate-900 border border-slate-800 rounded-lg">
-        <button
-          onClick={() => { setTimeMode('timestamp'); setInputValue(''); }}
-          className={`py-1.5 text-xs rounded-md font-medium transition-all ${timeMode === 'timestamp' ? 'bg-slate-800 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
-        >
-          Timestamp → Date
-        </button>
-        <button
-          onClick={() => { setTimeMode('datetime'); setInputValue(''); }}
-          className={`py-1.5 text-xs rounded-md font-medium transition-all ${timeMode === 'datetime' ? 'bg-slate-800 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
-        >
-          Date → Timestamp
-        </button>
-      </div>
+        {/* Mode Switcher */}
+        <div className="grid grid-cols-2 gap-2 my-4 p-1 bg-slate-900 border border-slate-800 rounded-lg">
+          <button
+            onClick={() => { setTimeMode('timestamp'); setInputValue(''); }}
+            className={`py-1.5 text-xs rounded-md font-medium transition-all ${timeMode === 'timestamp' ? 'bg-slate-800 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
+          >
+            Timestamp → Date
+          </button>
+          <button
+            onClick={() => { setTimeMode('datetime'); setInputValue(''); }}
+            className={`py-1.5 text-xs rounded-md font-medium transition-all ${timeMode === 'datetime' ? 'bg-slate-800 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
+          >
+            Date → Timestamp
+          </button>
+        </div>
 
-      {/* Input Section */}
-      <div className="space-y-1.5">
-        <label className="text-xs text-slate-500 font-semibold tracking-wide">
-          INPUT {timeMode === 'timestamp' ? 'UNIX TIMESTAMP' : 'DATETIME STRING'}
-        </label>
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          placeholder={timeMode === 'timestamp' ? 'e.g. 1717113600' : 'e.g. 2026-06-01 12:00:00'}
-          className="w-full px-3 py-2 text-sm bg-slate-900 border border-slate-800 focus:border-emerald-500/50 rounded-lg outline-none text-slate-200 font-mono tracking-wide placeholder-slate-700 transition-all"
-        />
-      </div>
+        {/* Input Section */}
+        <div className="space-y-1.5">
+          <label className="text-xs text-slate-500 font-semibold tracking-wide">
+            INPUT {timeMode === 'timestamp' ? 'UNIX TIMESTAMP' : 'DATETIME STRING'}
+          </label>
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder={timeMode === 'timestamp' ? 'e.g. 1717113600' : 'e.g. 2026-06-01 12:00:00'}
+            className="w-full px-3 py-2 text-sm bg-slate-900 border border-slate-800 focus:border-emerald-500/50 rounded-lg outline-none text-slate-200 font-mono tracking-wide placeholder-slate-700 transition-all"
+          />
+        </div>
 
-      {/* Output / Results Display */}
-      <div className="mt-5 space-y-4">
-        {inputValue && !conversionResult.isValid ? (
-          <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs rounded-lg font-semibold tracking-wide animate-pulse">
-            ✕ INVALID INPUT FORMAT
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {/* Local Time Result */}
-            <div 
-              onClick={() => handleCopy(conversionResult.local, 'local')}
-              className="group p-2.5 bg-slate-900/50 border border-slate-900 hover:border-slate-800 rounded-lg cursor-pointer transition-all relative overflow-hidden"
-            >
-              <div className="text-[10px] text-slate-500 font-bold tracking-wider mb-1">LOCAL TIME</div>
-              <div className="text-xs text-slate-300 break-all">{conversionResult.local || '--'}</div>
-              <span className="absolute right-2 top-2 text-[10px] text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                {copyStatus === 'local' ? '✓ COPIED' : 'CLICK TO COPY'}
-              </span>
+        {/* Output / Results Display */}
+        <div className="mt-5 space-y-4">
+          {inputValue && !conversionResult.isValid ? (
+            <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs rounded-lg font-semibold tracking-wide animate-pulse">
+              ✕ INVALID INPUT FORMAT
             </div>
+          ) : (
+            <div className="space-y-3">
+              {/* Local Time Result */}
+              <div
+                onClick={() => handleCopy(conversionResult.local, 'local')}
+                className="group p-2.5 bg-slate-900/50 border border-slate-900 hover:border-slate-800 rounded-lg cursor-pointer transition-all relative overflow-hidden"
+              >
+                <div className="text-[10px] text-slate-500 font-bold tracking-wider mb-1">LOCAL TIME</div>
+                <div className="text-xs text-slate-300 break-all">{conversionResult.local || '--'}</div>
+                <span className="absolute right-2 top-2 text-[10px] text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {copyStatus === 'local' ? '✓ COPIED' : 'CLICK TO COPY'}
+                </span>
+              </div>
 
-            {/* UTC Time Result */}
-            <div 
-              onClick={() => handleCopy(conversionResult.utc, 'utc')}
-              className="group p-2.5 bg-slate-900/50 border border-slate-900 hover:border-slate-800 rounded-lg cursor-pointer transition-all relative overflow-hidden"
-            >
-              <div className="text-[10px] text-slate-500 font-bold tracking-wider mb-1">UTC ISO STRING</div>
-              <div className="text-xs text-slate-300 break-all">{conversionResult.utc || '--'}</div>
-              <span className="absolute right-2 top-2 text-[10px] text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                {copyStatus === 'utc' ? '✓ COPIED' : 'CLICK TO COPY'}
-              </span>
+              {/* UTC Time Result */}
+              <div
+                onClick={() => handleCopy(conversionResult.utc, 'utc')}
+                className="group p-2.5 bg-slate-900/50 border border-slate-900 hover:border-slate-800 rounded-lg cursor-pointer transition-all relative overflow-hidden"
+              >
+                <div className="text-[10px] text-slate-500 font-bold tracking-wider mb-1">UTC ISO STRING</div>
+                <div className="text-xs text-slate-300 break-all">{conversionResult.utc || '--'}</div>
+                <span className="absolute right-2 top-2 text-[10px] text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {copyStatus === 'utc' ? '✓ COPIED' : 'CLICK TO COPY'}
+                </span>
+              </div>
+
+              {/* Relative Time Result */}
+              <div className="p-2.5 bg-slate-900/30 border border-slate-950 rounded-lg">
+                <div className="text-[10px] text-slate-500 font-bold tracking-wider mb-1">RELATIVE TIME</div>
+                <div className="text-xs text-emerald-500/80 font-semibold">{conversionResult.relative || '--'}</div>
+              </div>
             </div>
+          )}
+        </div>
 
-            {/* Relative Time Result */}
-            <div className="p-2.5 bg-slate-900/30 border border-slate-950 rounded-lg">
-              <div className="text-[10px] text-slate-500 font-bold tracking-wider mb-1">RELATIVE TIME</div>
-              <div className="text-xs text-emerald-500/80 font-semibold">{conversionResult.relative || '--'}</div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Footer */}
-      <div className="mt-6 pt-2 border-t border-slate-900 text-center">
-        <span className="text-[10px] text-slate-600 tracking-wider">
-          PRESS <kbd className="px-1 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-400 text-[9px] shadow-sm">ALT + T</kbd> TO QUICK TOGGLE
-        </span>
+        {/* Footer */}
+        <div className="mt-6 pt-2 border-t border-slate-900 text-center">
+          <span className="text-[10px] text-slate-600 tracking-wider">
+            PRESS <kbd className="px-1 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-400 text-[9px] shadow-sm">ALT + T</kbd> TO QUICK TOGGLE
+          </span>
+        </div>
       </div>
     </div>
   );

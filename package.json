@@ -2,7 +2,7 @@
   "name": "TIMESTAMP-PRO",
   "description": "⚡ Ultimate lightweight Unix timestamp converter browser extension built with React 19, TS & WXT. Features 10/13-digit smart auto-detection & pure sandboxed Iframe isolation.",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "scripts": {
     "dev": "wxt --host 0.0.0.0",
