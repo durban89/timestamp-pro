@@ -8,9 +8,9 @@ export default defineConfig({
   },
   // ⭐ 确保内容脚本支持注入样式
   manifest: {
-    version: '1.0.1',
-    name: '⚡ Timestamp Pro - Unix Epoch Converter',
-    description: 'Instantly convert Unix timestamps via selection or popup. 10/13-digit smart auto-detection with pure dark extreme theme.',
+    version: '1.0.2',
+    name: 'Unix Timestamp Converter & Epoch Pro',
+    description: 'Instantly convert Unix timestamps via selection or popup. Smart 10/13-digit auto-detection, UTC/local timezone, and dark mode.',
     icons: {
       '16': 'icon/16.png',
       '32': 'icon/32.png',

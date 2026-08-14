@@ -1,6 +1,6 @@
 {
-  "name": "TIMESTAMP-PRO",
-  "description": "⚡ Ultimate lightweight Unix timestamp converter browser extension built with React 19, TS & WXT. Features 10/13-digit smart auto-detection & pure sandboxed Iframe isolation.",
+  "name": "Unix-Timestamp-Converter-Epoch-Pro",
+  "description": "Instantly convert Unix timestamps via selection or popup. Smart 10/13-digit auto-detection, UTC/local timezone, and dark mode.",
   "private": true,
   "version": "1.0.1",
   "type": "module",

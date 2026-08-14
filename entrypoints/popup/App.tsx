@@ -1,9 +1,6 @@
-import { useState } from 'react';
-import reactLogo from '@/assets/react.svg';
-import wxtLogo from '/wxt.svg';
+import { useState, useEffect } from 'react';
 import './App.css';
 
-// 严格的TypeScript类型声明
 type TimeMode = 'timestamp' | 'datetime';
 
 interface ConversionResult {
@@ -13,9 +10,7 @@ interface ConversionResult {
   isValid: boolean;
 }
 
-
-function App() {
-  // 1, 核心状态管理
+export default function App() {
   const [inputValue, setInputValue] = useState<string>('');
   const [timeMode, setTimeMode] = useState<TimeMode>('timestamp');
   const [conversionResult, setConversionResult] = useState<ConversionResult>({
@@ -27,31 +22,22 @@ function App() {
 
   const [copyStatus, setCopyStatus] = useState<string>('');
 
+  // 1. 读取网页划词传进来的 timestamp
   useEffect(() => {
-    // 动态获取当前扩展 manifest 中配置的名称并赋值给标签页标题
-    if (typeof browser !== 'undefined' && browser.runtime?.getManifest) {
-      document.title = browser.runtime.getManifest().name;
-    } else if (typeof chrome !== 'undefined' && chrome.runtime?.getManifest) {
-      document.title = chrome.runtime.getManifest().name;
-    }
-  }, []);
+    if (typeof chrome === 'undefined' || !chrome.storage) return;
 
-  useEffect(() => {
-    // 1. 页面初次加载时，先读取一次可能已经存在的划词数据
     chrome.storage.local.get(['activeTimestamp'], (res) => {
       if (res.activeTimestamp) {
-        setTimeMode('timestamp'); // 强行切到时间戳模式
-        setInputValue(res.activeTimestamp);
-        // 读取完后顺手清理掉，防止下次误触发
+        setTimeMode('timestamp');
+        setInputValue(String(res.activeTimestamp));
         chrome.storage.local.remove(['activeTimestamp']);
       }
     });
 
-    // 2. 监听存储的变化（当用户在网页上再次划词时触发）
     const handleStorageChange = (changes: { [key: string]: chrome.storage.StorageChange }, areaName: string) => {
       if (areaName === 'local' && changes.activeTimestamp?.newValue) {
         setTimeMode('timestamp');
-        setInputValue(changes.activeTimestamp.newValue);
+        setInputValue(String(changes.activeTimestamp.newValue));
         chrome.storage.local.remove(['activeTimestamp']);
       }
     };
@@ -60,23 +46,16 @@ function App() {
     return () => chrome.storage.onChanged.removeListener(handleStorageChange);
   }, []);
 
-
-  // 2, 实现一件初始化当前时间戳
+  // 2. 获取当前时间戳
   const setNow = () => {
     const now = new Date();
     setInputValue(timeMode === 'timestamp' ? Math.floor(now.getTime() / 1000).toString() : now.toISOString());
-  }
+  };
 
-  // 3. 高强度核心数据清洗与转换逻辑
+  // 3. 转换计算逻辑
   useEffect(() => {
     if (!inputValue.trim()) {
-      setConversionResult({
-        local: '',
-        utc: '',
-        relative: '',
-        isValid: false,
-      });
-
+      setConversionResult({ local: '', utc: '', relative: '', isValid: false });
       return;
     }
 
@@ -84,11 +63,10 @@ function App() {
       let targetDate: Date;
 
       if (timeMode === 'timestamp') {
-        const cleanNum = inputValue.replace(/\D/g, ''); // 清洗非数字字符
+        const cleanNum = inputValue.replace(/\D/g, '');
         if (!cleanNum) throw new Error('Invalid format');
 
         const numericValue = parseInt(cleanNum, 10);
-
         targetDate = cleanNum.length > 10 ? new Date(numericValue) : new Date(numericValue * 1000);
       } else {
         targetDate = new Date(inputValue);
@@ -96,7 +74,6 @@ function App() {
 
       if (isNaN(targetDate.getTime())) throw new Error('Invalid date');
 
-      // 计算相对时间
       const diffMs = targetDate.getTime() - Date.now();
       const diffMins = Math.floor(diffMs / 60000);
       let relativeStr = '';
@@ -111,119 +88,162 @@ function App() {
         isValid: true,
       });
     } catch (err) {
-      setConversionResult(prev => ({ ...prev, isvalid: false }));
+      setConversionResult(prev => ({ ...prev, isValid: false }));
     }
   }, [inputValue, timeMode]);
 
-  //4, 复制到剪贴板的功能
+  // 4. 复制逻辑
   const handleCopy = async (text: string, label: string) => {
     if (!text) return;
-
     try {
       await navigator.clipboard.writeText(text);
-      setCopyStatus(`${label}`);
-      setTimeout(() => setCopyStatus(''), 2000);
+      setCopyStatus(label);
+      setTimeout(() => setCopyStatus(''), 1800);
     } catch (err) {
-      console.error('Failed to copy text: ', err);
+      console.error('Copy failed: ', err);
     }
   };
 
-  const isStandalone = new URLSearchParams(window.location.search).get('mode') === 'standalone';
+  const isStandalone = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('mode') === 'standalone';
 
   return (
-    <div className={isStandalone ? "fixed inset-0 w-screen h-screen flex items-center justify-center bg-slate-50 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem]" : ""}>
-      <div className="w-[380px] min-h-[420px] bg-slate-950 text-slate-100 p-4 font-mono select-none antialiased border border-slate-800 rounded-xl shadow-2xl shadow-emerald-500/5">
-        {/* Header */}
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-        <h1 className="text-sm font-bold tracking-wider text-emerald-400">⚡ TIMESTAMP PRO</h1>
-        <button 
-          onClick={setNow}
-          className="px-2 py-1 text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded transition-all duration-200"
-        >
-          GET NOW
-        </button>
-      </div>
+    <div className={isStandalone ? "fixed inset-0 w-screen h-screen flex items-center justify-center bg-slate-950 bg-[radial-gradient(#334155_1px,transparent_1px)] bg-[size:16px_16px]" : ""}>
+      <div className="w-[380px] bg-slate-950 text-slate-100 p-4 font-mono select-none antialiased border border-slate-800/80 rounded-2xl shadow-2xl relative overflow-hidden">
+        
+        {/* 💡 Header 布局重定义：不依赖冗长的 Manifest 名称，使用精细组件徽章 */}
+        <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse"></span>
+            <span className="text-xs font-bold tracking-widest text-slate-200">
+              EPOCH <span className="text-emerald-400 font-semibold text-[10px] bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-800/50">PRO</span>
+            </span>
+          </div>
 
-        {/* Mode Switcher */}
-        <div className="grid grid-cols-2 gap-2 my-4 p-1 bg-slate-900 border border-slate-800 rounded-lg">
+          <button 
+            onClick={setNow}
+            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg transition-all duration-200 cursor-pointer active:scale-95 shadow-xs"
+          >
+            <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            NOW
+          </button>
+        </div>
+
+        {/* 模式切换器（Segmented Control） */}
+        <div className="grid grid-cols-2 gap-1.5 my-3.5 p-1 bg-slate-900/90 border border-slate-800/80 rounded-xl">
           <button
             onClick={() => { setTimeMode('timestamp'); setInputValue(''); }}
-            className={`py-1.5 text-xs rounded-md font-medium transition-all ${timeMode === 'timestamp' ? 'bg-slate-800 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
+            className={`py-1.5 text-xs rounded-lg font-medium transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 ${
+              timeMode === 'timestamp' 
+                ? 'bg-slate-800 text-emerald-400 font-semibold shadow-xs border border-emerald-500/30' 
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
           >
-            Timestamp → Date
+            <span>Timestamp</span>
+            <span className="text-[10px] text-slate-500">→ Date</span>
           </button>
+          
           <button
             onClick={() => { setTimeMode('datetime'); setInputValue(''); }}
-            className={`py-1.5 text-xs rounded-md font-medium transition-all ${timeMode === 'datetime' ? 'bg-slate-800 text-emerald-400 shadow-sm' : 'text-slate-400 hover:text-slate-200'}`}
+            className={`py-1.5 text-xs rounded-md font-medium transition-all duration-200 cursor-pointer flex items-center justify-center gap-1 ${
+              timeMode === 'datetime' 
+                ? 'bg-slate-800 text-emerald-400 font-semibold shadow-xs border border-emerald-500/30' 
+                : 'text-slate-400 hover:text-slate-200'
+            }`}
           >
-            Date → Timestamp
+            <span>Date</span>
+            <span className="text-[10px] text-slate-500">→ Timestamp</span>
           </button>
         </div>
 
-        {/* Input Section */}
+        {/* 输入框区域 */}
         <div className="space-y-1.5">
-          <label className="text-xs text-slate-500 font-semibold tracking-wide">
-            INPUT {timeMode === 'timestamp' ? 'UNIX TIMESTAMP' : 'DATETIME STRING'}
-          </label>
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder={timeMode === 'timestamp' ? 'e.g. 1717113600' : 'e.g. 2026-06-01 12:00:00'}
-            className="w-full px-3 py-2 text-sm bg-slate-900 border border-slate-800 focus:border-emerald-500/50 rounded-lg outline-none text-slate-200 font-mono tracking-wide placeholder-slate-700 transition-all"
-          />
+          <div className="flex justify-between items-center px-0.5">
+            <label className="text-[10px] text-slate-400 font-semibold tracking-wider">
+              INPUT {timeMode === 'timestamp' ? 'UNIX TIMESTAMP' : 'DATETIME STRING'}
+            </label>
+            {inputValue && (
+              <button 
+                onClick={() => setInputValue('')}
+                className="text-[10px] text-slate-500 hover:text-slate-300 transition-colors cursor-pointer"
+              >
+                清空
+              </button>
+            )}
+          </div>
+          <div className="relative">
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder={timeMode === 'timestamp' ? 'e.g. 1717113600' : 'e.g. 2026-06-01 12:00:00'}
+              className="w-full px-3 py-2 text-xs bg-slate-900/90 border border-slate-800/80 focus:border-emerald-500/60 rounded-xl outline-none text-slate-100 font-mono tracking-wide placeholder-slate-600 transition-all focus:ring-1 focus:ring-emerald-500/30 shadow-inner"
+            />
+          </div>
         </div>
 
-        {/* Output / Results Display */}
-        <div className="mt-5 space-y-4">
+        {/* 输出结果区 */}
+        <div className="mt-3.5 space-y-2">
           {inputValue && !conversionResult.isValid ? (
-            <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs rounded-lg font-semibold tracking-wide animate-pulse">
-              ✕ INVALID INPUT FORMAT
+            <div className="p-3 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs rounded-xl font-medium tracking-wide flex items-center gap-2">
+              <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <span>格式无效，请输入正确的 {timeMode === 'timestamp' ? '数字时间戳' : '日期字符串'}</span>
             </div>
           ) : (
-            <div className="space-y-3">
-              {/* Local Time Result */}
+            <div className="space-y-2">
+              {/* Local Time 卡片 */}
               <div
                 onClick={() => handleCopy(conversionResult.local, 'local')}
-                className="group p-2.5 bg-slate-900/50 border border-slate-900 hover:border-slate-800 rounded-lg cursor-pointer transition-all relative overflow-hidden"
+                className="group p-2.5 bg-slate-900/70 border border-slate-800/80 hover:border-emerald-500/40 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden active:scale-[0.99]"
               >
-                <div className="text-[10px] text-slate-500 font-bold tracking-wider mb-1">LOCAL TIME</div>
-                <div className="text-xs text-slate-300 break-all">{conversionResult.local || '--'}</div>
-                <span className="absolute right-2 top-2 text-[10px] text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                  {copyStatus === 'local' ? '✓ COPIED' : 'CLICK TO COPY'}
-                </span>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[10px] text-slate-500 font-bold tracking-wider">LOCAL TIME</span>
+                  <span className="text-[10px] text-emerald-400 opacity-80 group-hover:opacity-100 transition-opacity font-semibold">
+                    {copyStatus === 'local' ? '✓ COPIED' : 'CLICK TO COPY'}
+                  </span>
+                </div>
+                <div className="text-xs text-slate-200 font-semibold break-all">
+                  {conversionResult.local || <span className="text-slate-600 font-normal">等待输入...</span>}
+                </div>
               </div>
 
-              {/* UTC Time Result */}
+              {/* UTC Time 卡片 */}
               <div
                 onClick={() => handleCopy(conversionResult.utc, 'utc')}
-                className="group p-2.5 bg-slate-900/50 border border-slate-900 hover:border-slate-800 rounded-lg cursor-pointer transition-all relative overflow-hidden"
+                className="group p-2.5 bg-slate-900/70 border border-slate-800/80 hover:border-emerald-500/40 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden active:scale-[0.99]"
               >
-                <div className="text-[10px] text-slate-500 font-bold tracking-wider mb-1">UTC ISO STRING</div>
-                <div className="text-xs text-slate-300 break-all">{conversionResult.utc || '--'}</div>
-                <span className="absolute right-2 top-2 text-[10px] text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                  {copyStatus === 'utc' ? '✓ COPIED' : 'CLICK TO COPY'}
-                </span>
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-[10px] text-slate-500 font-bold tracking-wider">UTC ISO STRING</span>
+                  <span className="text-[10px] text-emerald-400 opacity-80 group-hover:opacity-100 transition-opacity font-semibold">
+                    {copyStatus === 'utc' ? '✓ COPIED' : 'CLICK TO COPY'}
+                  </span>
+                </div>
+                <div className="text-xs text-slate-200 font-semibold break-all">
+                  {conversionResult.utc || <span className="text-slate-600 font-normal">等待输入...</span>}
+                </div>
               </div>
 
-              {/* Relative Time Result */}
-              <div className="p-2.5 bg-slate-900/30 border border-slate-950 rounded-lg">
-                <div className="text-[10px] text-slate-500 font-bold tracking-wider mb-1">RELATIVE TIME</div>
-                <div className="text-xs text-emerald-500/80 font-semibold">{conversionResult.relative || '--'}</div>
+              {/* Relative Time 卡片 */}
+              <div className="p-2.5 bg-slate-900/40 border border-slate-800/50 rounded-xl flex justify-between items-center">
+                <span className="text-[10px] text-slate-500 font-bold tracking-wider">RELATIVE TIME</span>
+                <span className="text-xs text-emerald-400 font-semibold">
+                  {conversionResult.relative || <span className="text-slate-600 font-normal">--</span>}
+                </span>
               </div>
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="mt-6 pt-2 border-t border-slate-900 text-center">
+        {/* Footer 快捷键提示 */}
+        <div className="mt-4 pt-2.5 border-t border-slate-900 text-center">
           <span className="text-[10px] text-slate-600 tracking-wider">
-            PRESS <kbd className="px-1 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-400 text-[9px] shadow-sm">ALT + T</kbd> TO QUICK TOGGLE
+            快捷键 <kbd className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-400 text-[9px] shadow-xs">Alt + T</kbd> 快速呼出插件
           </span>
         </div>
       </div>
     </div>
   );
 }
-
-export default App;
