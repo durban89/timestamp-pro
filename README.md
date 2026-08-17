@@ -1,67 +1,66 @@
-# Unix Timestamp Converter & Epoch Pro
+<div align="center">
 
-**A fast, privacy-first Unix timestamp converter for developers.**
+  <img src="assets/icon.svg" alt="Unix Timestamp Converter Logo" width="128" height="128" />
 
-Convert Unix timestamps to human-readable dates — and dates back to Unix timestamps — directly in your browser.
+  <h1>Unix Timestamp Converter & Epoch Pro</h1>
 
-Designed for developers, backend engineers, data analysts, and anyone who frequently works with timestamps.
+  <p>
+    <b>A fast, privacy-first Unix timestamp converter built for developers and everyday debugging.</b>
+  </p>
 
-[![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Available-brightgreen?logo=googlechrome)](https://chromewebstore.google.com/detail/%E2%9A%A1-timestamp-pro-unix-epoc/bpkonjocbaapcknnndcgofaicjceioap)
-[![License](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
+  <p>
+    <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18%2F19-61DAFB?logo=react&logoColor=black" alt="React" /></a>
+    <a href="https://wxt.dev"><img src="https://img.shields.io/badge/WXT-Framework-6366F1" alt="WXT Framework" /></a>
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-AGPL--3.0-green.svg" alt="License" /></a>
+  </p>
 
----
-
-## ✨ Features
-
-* **Smart Timestamp Detection**
-
-  * Automatically detects 10-digit Unix timestamps (seconds)
-  * Automatically detects 13-digit Unix timestamps (milliseconds)
-
-* **Instant Conversion**
-
-  * Convert Unix timestamps to readable dates
-  * Convert dates to Unix timestamps
-
-* **UTC & Local Time**
-
-  * Easily switch between UTC and your local timezone
-  * Useful when debugging APIs, logs, databases, and distributed systems
-
-* **Text Selection**
-
-  * Select a timestamp on any webpage and convert it instantly
-
-* **Browser Popup**
-
-  * Quickly convert timestamps without leaving the current page
-
-* **Developer-Friendly**
-
-  * Simple and distraction-free interface
-  * Designed for everyday development workflows
-
-* **Privacy First**
-
-  * All conversions are performed locally in your browser
-  * No timestamp data is uploaded to a server
-  * No external API required
+</div>
 
 ---
 
-## 🚀 Use Cases
+## 📖 Introduction
 
-Unix Timestamp Converter is useful when working with:
+**Unix Timestamp Converter & Epoch Pro** is a lightweight browser extension for converting Unix timestamps and human-readable dates directly from your browser.
 
-* API requests and responses
-* Backend development
-* Server logs
-* Database timestamps
-* JSON data
-* Unix/Linux systems
-* JavaScript / TypeScript applications
-* Go, Python, Java, PHP, and other backend languages
-* Data analysis and debugging
+It automatically detects common Unix timestamp formats and makes it easy to switch between UTC and local time.
+
+Whether you're debugging API responses, inspecting server logs, working with databases, or analyzing JSON data, the extension provides a quick way to understand timestamps without leaving your current workflow.
+
+## ✨ Key Features
+
+* ⚡ **Instant Timestamp Conversion**
+  Convert Unix timestamps into readable dates and convert dates back into Unix timestamps.
+
+* 🧠 **Smart 10 / 13-Digit Detection**
+  Automatically recognizes 10-digit second-based timestamps and 13-digit millisecond-based timestamps.
+
+* 🌍 **UTC & Local Time**
+  Easily view timestamps in UTC or your local timezone.
+
+* 🖱️ **Selection-Based Conversion**
+  Select a timestamp directly on a webpage and convert it without manually copying the value.
+
+* 🧩 **Browser Popup**
+  Quickly perform conversions from the extension popup whenever you need them.
+
+* 🔢 **Seconds & Milliseconds**
+  Supports both common Unix timestamp units without requiring manual unit selection.
+
+* 🚀 **Lightweight & Fast**
+  Designed as a focused developer utility with minimal overhead.
+
+## 🎯 Use Cases
+
+Unix Timestamp Converter is particularly useful for:
+
+* 🧑‍💻 Backend development
+* 🌐 API debugging
+* 📋 JSON inspection
+* 🗄️ Database development
+* 📜 Server log analysis
+* 🔧 DevOps workflows
+* 📊 Data analysis
+* 🐛 Debugging distributed systems
 
 For example:
 
@@ -69,136 +68,81 @@ For example:
 1755446400
 ```
 
-can be converted into a human-readable date without manually calculating the timestamp.
+can be instantly interpreted as a human-readable date instead of manually converting the value.
 
----
+## 🛠 Tech Stack
 
-## 🔒 Privacy
+* **UI Framework:** React
+* **Extension Framework:** [WXT](https://wxt.dev/)
+* **Browser APIs:** Chrome Extensions APIs
+* **Timestamp Processing:** Local JavaScript date and time APIs
 
-**Your timestamp data stays on your device.**
+## 🚀 Getting Started
 
-Unix Timestamp Converter does not require a backend server or external timestamp conversion service.
+### Prerequisites
 
-All timestamp conversions are processed locally inside the browser.
+Make sure you have:
 
-We do not:
+* **Node.js:** `>= 18.0.0`
+* **Package Manager:** `pnpm` recommended, or `npm` / `yarn`
 
-* Upload your timestamps
-* Store your conversion history on a server
-* Sell or share your data
-* Require an account
-* Track the content you convert
-
-For more information, see the project's privacy policy.
-
----
-
-## 🧩 How It Works
-
-### 1. Select a timestamp
-
-Select a Unix timestamp directly on a webpage.
-
-### 2. Convert instantly
-
-Use the extension to convert the selected timestamp into a readable date.
-
-### 3. Switch timezone
-
-View the result in either:
-
-* UTC
-* Local Time
-
-You can also use the extension popup when you need to perform a conversion manually.
-
----
-
-## 📦 Installation
-
-### Chrome Web Store
-
-Install the extension from the Chrome Web Store:
-
-**[Install Unix Timestamp Converter & Epoch Pro](https://chromewebstore.google.com/detail/%E2%9A%A1-timestamp-pro-unix-epoc/bpkonjocbaapcknnndcgofaicjceioap)**
-
-### From Source
-
-You can also install the extension manually from this repository.
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/durban89/unix-timestamp-converter-epoch-pro.git
-cd unix-timestamp-converter-epoch-pro
-```
-
-2. Install dependencies:
-
-```bash
-npm install
-```
-
-3. Build the extension:
-
-```bash
-npm run build
-```
-
-4. Open Chrome and navigate to:
-
-```text
-chrome://extensions/
-```
-
-5. Enable **Developer mode**.
-
-6. Click **Load unpacked**.
-
-7. Select the generated extension directory.
-
----
-
-## 🛠️ Development
+### Installation
 
 Clone the repository:
 
 ```bash
-git clone https://github.com/durban89/unix-timestamp-converter-epoch-pro.git
-cd unix-timestamp-converter-epoch-pro
+git clone YOUR_GITHUB_REPOSITORY_URL
+cd YOUR_REPOSITORY_NAME
 ```
 
 Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
-Start the development environment:
+Start development:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
-Build for production:
+Build the production extension:
 
 ```bash
-npm run build
+pnpm build
 ```
 
----
+### Load in Chrome
+
+1. Open `chrome://extensions/`
+2. Enable **Developer mode**
+3. Click **Load unpacked**
+4. Select the generated extension directory
 
 ## 📁 Project Structure
 
 ```text
 .
 ├── assets
+│   ├── Desktop.png
+│   ├── icon
+│   ├── icon.png
+│   ├── icon.svg
+│   └── react.svg
 ├── components
+│   └── TimeBubble.tsx
 ├── entrypoints
+│   ├── background.ts
+│   ├── bubble
+│   ├── content.ts
+│   └── popup
 ├── LICENSE
 ├── package.json
 ├── postcss.config.js
 ├── public
+│   ├── icon
+│   └── wxt.svg
 ├── README.md
 ├── tailwind.config.js
 ├── tsconfig.json
@@ -208,71 +152,43 @@ npm run build
 
 > The actual project structure may vary depending on the current implementation.
 
----
+## 🔒 Privacy
 
-## 🧑‍💻 Who Is It For?
+**Unix Timestamp Converter & Epoch Pro is privacy-first.**
 
-Unix Timestamp Converter is built for people who work with timestamps regularly:
+Timestamp conversion is performed locally in your browser.
 
-* Backend developers
-* Frontend developers
-* Full-stack developers
-* DevOps engineers
-* Data analysts
-* Database engineers
-* Indie hackers
-* Students learning programming
+The extension does not need to upload timestamp values to a remote server or rely on an external timestamp conversion API.
 
-If you frequently copy timestamps from logs, APIs, databases, or development tools, this extension is designed for you.
+It does not require:
 
----
+* An account
+* A remote conversion service
+* Uploading timestamp data
+* Server-side processing
 
-## 🌍 Why Unix Timestamp Converter?
-
-Timestamp conversion sounds simple, but developers encounter it constantly.
-
-Instead of opening a website every time you need to decode a timestamp, Unix Timestamp Converter keeps the conversion workflow directly inside your browser.
-
-**Select → Convert → Understand**
-
-No extra website.
-No account.
-No unnecessary network requests.
-
----
+Your timestamp values stay in your browser.
 
 ## 📜 License
 
-This project is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
+Unix Timestamp Converter & Epoch Pro is licensed under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
 
-See the [LICENSE](LICENSE) file for the full license text.
-
----
+See the [LICENSE](LICENSE) file for the complete license text.
 
 ## 👨‍💻 About
 
-**Unix Timestamp Converter & Epoch Pro** is an independent developer project focused on building small, useful, privacy-first developer tools.
+**Unix Timestamp Converter & Epoch Pro** is an independent developer project focused on building simple, privacy-friendly utilities for developers.
 
-Built with a simple philosophy:
+The goal is simple:
 
-> **Useful tools should be fast, simple, and privacy-friendly.**
-
----
+> **Make everyday developer tasks faster and easier.**
 
 ## ⭐ Support
 
-If you find this extension useful, consider giving the repository a ⭐ on GitHub.
-
-Your support helps independent developers continue building useful tools for the developer community.
-
----
-
-## 📬 Feedback & Contributions
+If you find the extension useful, consider giving the repository a ⭐ on GitHub.
 
 Bug reports, feature requests, and contributions are welcome.
 
-If you encounter a problem or have an idea for improvement, please open an issue on GitHub.
-
 ---
 
-**Made for developers. Built independently. Privacy first.**
+**Built independently. Built for developers. Privacy first.**
