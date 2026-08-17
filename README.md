@@ -196,7 +196,6 @@ npm run build
 ├── components
 ├── entrypoints
 ├── LICENSE
-├── node_modules
 ├── package.json
 ├── postcss.config.js
 ├── public
