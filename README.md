@@ -133,16 +133,15 @@ pnpm build
 ```text
 .
 ├── assets
-├── components
 ├── entrypoints
 ├── LICENSE
 ├── package.json
-├── postcss.config.js
+├── package-lock.json
 ├── public
 ├── README.md
 ├── scripts
-├── tailwind.config.js
 ├── tsconfig.json
+├── utils
 ├── wxt.config.ts
 └── yarn.lock
 ```
