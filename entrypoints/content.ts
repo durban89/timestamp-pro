@@ -1,7 +1,4 @@
-import React from 'react';
-import { createRoot, type Root } from 'react-dom/client';
-import '@/entrypoints/popup/App.css';
-import TimeBubble from '@/components/TimeBubble';
+
 
 export default defineContentScript({
   matches: import.meta.env.MODE === 'development' 
