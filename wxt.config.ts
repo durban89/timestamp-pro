@@ -1,4 +1,5 @@
 import { defineConfig } from 'wxt';
+import tailwindcss from '@tailwindcss/vite';
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -40,6 +41,7 @@ export default defineConfig({
     ],
   },
   vite: () => ({
+    plugins: [tailwindcss()],
     server: {
       host: '0.0.0.0', // 监听所有网络接口
       port: 3000,
