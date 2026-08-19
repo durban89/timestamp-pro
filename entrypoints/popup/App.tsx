@@ -7,6 +7,8 @@ interface ConversionResult {
   local: string;
   utc: string;
   relative: string;
+  timestampSec: string;
+  timestampMs: string;
   isValid: boolean;
 }
 
@@ -17,6 +19,8 @@ export default function App() {
     local: '',
     utc: '',
     relative: '',
+    timestampSec: '',
+    timestampMs: '',
     isValid: false,
   });
 
@@ -55,7 +59,7 @@ export default function App() {
   // 3. Conversion logic
   useEffect(() => {
     if (!inputValue.trim()) {
-      setConversionResult({ local: '', utc: '', relative: '', isValid: false });
+      setConversionResult({ local: '', utc: '', relative: '', timestampSec: '', timestampMs: '', isValid: false });
       return;
     }
 
@@ -85,6 +89,8 @@ export default function App() {
         local: targetDate.toLocaleString(),
         utc: targetDate.toUTCString(),
         relative: relativeStr,
+        timestampSec: Math.floor(targetDate.getTime() / 1000).toString(),
+        timestampMs: targetDate.getTime().toString(),
         isValid: true,
       });
     } catch (err) {
@@ -194,37 +200,75 @@ export default function App() {
             </div>
           ) : (
             <div className="space-y-2">
-              {/* Local Time card */}
-              <div
-                onClick={() => handleCopy(conversionResult.local, 'local')}
-                className="group p-2.5 bg-slate-900/70 border border-slate-800/80 hover:border-emerald-500/40 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden active:scale-[0.99]"
-              >
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-[10px] text-slate-500 font-bold tracking-wider">LOCAL TIME</span>
-                  <span className="text-[10px] text-emerald-400 opacity-80 group-hover:opacity-100 transition-opacity font-semibold">
-                    {copyStatus === 'local' ? '✓ COPIED' : 'CLICK TO COPY'}
-                  </span>
-                </div>
-                <div className="text-xs text-slate-200 font-semibold break-all">
-                  {conversionResult.local || <span className="text-slate-600 font-normal">Waiting for input...</span>}
-                </div>
-              </div>
+              {timeMode === 'datetime' ? (
+                <>
+                  {/* Timestamp (seconds) card */}
+                  <div
+                    onClick={() => handleCopy(conversionResult.timestampSec, 'tsSec')}
+                    className="group p-2.5 bg-slate-900/70 border border-slate-800/80 hover:border-emerald-500/40 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden active:scale-[0.99]"
+                  >
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[10px] text-slate-500 font-bold tracking-wider">TIMESTAMP (SEC)</span>
+                      <span className="text-[10px] text-emerald-400 opacity-80 group-hover:opacity-100 transition-opacity font-semibold">
+                        {copyStatus === 'tsSec' ? '✓ COPIED' : 'CLICK TO COPY'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-slate-200 font-semibold break-all">
+                      {conversionResult.timestampSec || <span className="text-slate-600 font-normal">Waiting for input...</span>}
+                    </div>
+                  </div>
 
-              {/* UTC Time card */}
-              <div
-                onClick={() => handleCopy(conversionResult.utc, 'utc')}
-                className="group p-2.5 bg-slate-900/70 border border-slate-800/80 hover:border-emerald-500/40 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden active:scale-[0.99]"
-              >
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-[10px] text-slate-500 font-bold tracking-wider">UTC ISO STRING</span>
-                  <span className="text-[10px] text-emerald-400 opacity-80 group-hover:opacity-100 transition-opacity font-semibold">
-                    {copyStatus === 'utc' ? '✓ COPIED' : 'CLICK TO COPY'}
-                  </span>
-                </div>
-                <div className="text-xs text-slate-200 font-semibold break-all">
-                  {conversionResult.utc || <span className="text-slate-600 font-normal">Waiting for input...</span>}
-                </div>
-              </div>
+                  {/* Timestamp (milliseconds) card */}
+                  <div
+                    onClick={() => handleCopy(conversionResult.timestampMs, 'tsMs')}
+                    className="group p-2.5 bg-slate-900/70 border border-slate-800/80 hover:border-emerald-500/40 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden active:scale-[0.99]"
+                  >
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[10px] text-slate-500 font-bold tracking-wider">TIMESTAMP (MS)</span>
+                      <span className="text-[10px] text-emerald-400 opacity-80 group-hover:opacity-100 transition-opacity font-semibold">
+                        {copyStatus === 'tsMs' ? '✓ COPIED' : 'CLICK TO COPY'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-slate-200 font-semibold break-all">
+                      {conversionResult.timestampMs || <span className="text-slate-600 font-normal">Waiting for input...</span>}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Local Time card */}
+                  <div
+                    onClick={() => handleCopy(conversionResult.local, 'local')}
+                    className="group p-2.5 bg-slate-900/70 border border-slate-800/80 hover:border-emerald-500/40 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden active:scale-[0.99]"
+                  >
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[10px] text-slate-500 font-bold tracking-wider">LOCAL TIME</span>
+                      <span className="text-[10px] text-emerald-400 opacity-80 group-hover:opacity-100 transition-opacity font-semibold">
+                        {copyStatus === 'local' ? '✓ COPIED' : 'CLICK TO COPY'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-slate-200 font-semibold break-all">
+                      {conversionResult.local || <span className="text-slate-600 font-normal">Waiting for input...</span>}
+                    </div>
+                  </div>
+
+                  {/* UTC Time card */}
+                  <div
+                    onClick={() => handleCopy(conversionResult.utc, 'utc')}
+                    className="group p-2.5 bg-slate-900/70 border border-slate-800/80 hover:border-emerald-500/40 rounded-xl cursor-pointer transition-all duration-200 relative overflow-hidden active:scale-[0.99]"
+                  >
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-[10px] text-slate-500 font-bold tracking-wider">UTC ISO STRING</span>
+                      <span className="text-[10px] text-emerald-400 opacity-80 group-hover:opacity-100 transition-opacity font-semibold">
+                        {copyStatus === 'utc' ? '✓ COPIED' : 'CLICK TO COPY'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-slate-200 font-semibold break-all">
+                      {conversionResult.utc || <span className="text-slate-600 font-normal">Waiting for input...</span>}
+                    </div>
+                  </div>
+                </>
+              )}
 
               {/* Relative Time card */}
               <div className="p-2.5 bg-slate-900/40 border border-slate-800/50 rounded-xl flex justify-between items-center">
