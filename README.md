@@ -8,6 +8,14 @@
     <b>A fast, privacy-first Unix timestamp converter built for developers and everyday debugging.</b>
   </p>
 
+  <p></p>
+
+  <div align="center">
+    <img src="assets/Desktop.png" alt="PulseTimer" width="800" />
+  </div>
+
+  <p></p>
+
   <p>
     <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18%2F19-61DAFB?logo=react&logoColor=black" alt="React" /></a>
     <a href="https://wxt.dev"><img src="https://img.shields.io/badge/WXT-Framework-6366F1" alt="WXT Framework" /></a>
@@ -91,8 +99,8 @@ Make sure you have:
 Clone the repository:
 
 ```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
-cd YOUR_REPOSITORY_NAME
+git clone https://github.com/durban89/unix-timestamp-converter-epoch-pro.git
+cd unix-timestamp-converter-epoch-pro
 ```
 
 Install dependencies:
@@ -125,25 +133,14 @@ pnpm build
 ```text
 .
 ├── assets
-│   ├── Desktop.png
-│   ├── icon
-│   ├── icon.png
-│   ├── icon.svg
-│   └── react.svg
 ├── components
-│   └── TimeBubble.tsx
 ├── entrypoints
-│   ├── background.ts
-│   ├── bubble
-│   ├── content.ts
-│   └── popup
 ├── LICENSE
 ├── package.json
 ├── postcss.config.js
 ├── public
-│   ├── icon
-│   └── wxt.svg
 ├── README.md
+├── scripts
 ├── tailwind.config.js
 ├── tsconfig.json
 ├── wxt.config.ts
